@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 import urllib2, sys, time
 import rrdtool
-url = ""
-rrd_file = "/tmp/spped.rrd"
+import sys
 
+url = sys.argv[1]
+output = sys.argv[2] if len(sys.argv) >= 3 else "default.png"
+rrd_file = "/tmp/spped.rrd"
+ 
 def chunk_report(bytes_so_far, chunk_size, total_size, time_start, time_prev, time_curr):
     percent = float(bytes_so_far) / total_size
     percent = round(percent*100, 2)
@@ -36,8 +39,8 @@ if __name__ == '__main__':
     response = urllib2.urlopen(url);
     chunk_read(response, 1024, report_hook=chunk_report)
 
-    ret = rrdtool.graph( "/srv/www/mca/speed/speed.png", "--start", "-2d", "--vertical-label=KB/s",
-'--watermark=ewa5.iba',
+    ret = rrdtool.graph( output, "--start", "-2d", "--vertical-label=KB/s",
+'--watermark=stat',
 "-w 800",
 "DEF:m1_num="+rrd_file+":speed_av:AVERAGE",
 "DEF:m2_num="+rrd_file+":speed_react:AVERAGE",
